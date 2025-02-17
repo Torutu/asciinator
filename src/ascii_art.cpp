@@ -58,7 +58,7 @@ void generateAsciiArt(const std::string& imageFilename, int blockSize, const std
     }
 
     // Open the result.txt file for writing
-    std::ofstream outputFile(outputFilename);
+    std::ofstream outputFile(outputFilename); //needs #include <fstream>
 
     // Check if the file is open
     if (!outputFile.is_open()) {

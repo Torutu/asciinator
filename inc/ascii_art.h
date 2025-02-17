@@ -6,10 +6,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
 
 
 // Function to map pixel intensity to ASCII character
