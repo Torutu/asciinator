@@ -6,7 +6,7 @@ OPENCV_LIBS = `pkg-config --libs opencv4`
 CFLAGS = -Wall -Wextra -Werror -std=c++11 $(OPENCV_CFLAGS)
 LDFLAGS = $(OPENCV_LIBS)
 
-SRC = src/main.cpp
+SRC = src/main.cpp src/ascii_art.cpp
 OBJ_DIR = obj
 OBJ = $(SRC:src/%.cpp=$(OBJ_DIR)/%.o)
 

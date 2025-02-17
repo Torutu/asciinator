@@ -1,47 +1,29 @@
-// #include <opencv2/opencv.hpp>
-// #include <iostream>
- 
-//  int main() {
-//      // Load the image
-//      cv::Mat image = cv::imread("ea.jpg");
- 
-//      // Check if the image was loaded correctly
-//      if (image.empty()) {
-//          std::cerr << "Could not open or find the image.\n";
-//          return -1;
-//      }
- 
-//      // Convert to grayscale (black & white)
-//      cv::Mat grayscale;
-//      cv::cvtColor(image, grayscale, cv::COLOR_BGR2GRAY);
- 
-//      // Save the new image
-//      cv::imwrite("grayscale.jpg", grayscale);
- 
-//      std::cout << "Converted image saved as grayscale.jpg\n";
-//      return 0;
-//  }
- 
-#include <opencv2/opencv.hpp>
-#include <iostream>
+#include "../inc/ascii_art.h"
 
-int main() {
-    // Load the grayscale image
-    cv::Mat image = cv::imread("ea.jpg", cv::IMREAD_GRAYSCALE);
-
-    // Check if the image is loaded correctly
-    if (image.empty()) {
-        std::cerr << "Error: Could not open or find the image!" << std::endl;
+int main(int argc, char** argv) {
+    // Check if an image filename is provided as a command line argument
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << "<block size>(1-100) <image_filename>" << std::endl;
         return -1;
     }
 
-    // for (int y = 0; y < image.rows; y++) {
-    //     for (int x = 0; x < image.cols; x++) {
-    //         std::cout << "Pixel at (" << x << "," << y << "): " << (int)image.at<uchar>(y, x) << std::endl;
-    //     }
-    // }
-    
-    std::cout << "Image size: " << image.size() << std::endl;
+    std::string imageFilename = argv[2];
+
+    // Ensure the image file has a .jpg extension
+    if (!hasJpgExtension(imageFilename)) {
+        std::cerr << "Error: The file must be a .jpg image!" << std::endl;
+        return -1;
+    }
+
+    // Load block_size from settings file
+	int blockSize = std::atoi(argv[1]);
+	if(blockSize < 1 || blockSize > 100) {
+		std::cerr << "Error: Block size must be between 1 and 100!" << std::endl;
+		return -1;
+	}
+
+    // Generate ASCII art and save it to result.txt
+    generateAsciiArt(imageFilename, blockSize, "result.txt");
 
     return 0;
 }
