@@ -47,11 +47,13 @@ $(OBJ_DIR)/%.o: src/%.cpp
 
 install_opencv:
 	@ echo -e "$(MAGENTA)Installing OpenCV...$(RESET)"
+	@ sudo apt-get update
 	@ sudo apt-get install libopencv-dev
 
 rm_opencv:
 	@ echo -e "$(RED)Removing OpenCV...$(RESET)"
 	@ sudo apt-get remove --purge libopencv-dev
+	@ sudo apt-get autoremove -y
 
 clean:
 	@ echo -e "$(RED)Removing $(OBJ_DIR) $(RESET)"
