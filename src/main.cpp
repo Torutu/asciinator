@@ -1,4 +1,4 @@
-#include "../inc/ascii_art.h"
+#include "../inc/ascii_art.hpp"
 
 int main(int argc, char** argv) {
     // Check if an image filename is provided as a command line argument
@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     std::string imageFilename = argv[2];
 
     // Ensure the image file has a .jpg extension
-    if (!hasJpgExtension(imageFilename)) {
+    if (!hasValidImageExtension(imageFilename)) {
         std::cerr << "Error: The file must be a .jpg image!" << std::endl;
         return -1;
     }

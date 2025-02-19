@@ -1,81 +1,88 @@
-#include "../inc/ascii_art.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "../inc/stb_image.h" // stb_image for image loading
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cstring> // For strlen()
+#include "../inc/ascii_art.hpp"
 
-// Function to map pixel intensity to ASCII character
+bool hasValidImageExtension(const std::string& filename) {
+    static const std::vector<std::string> validExtensions = {
+        ".jpg", ".jpeg", ".png", ".bmp"
+    };
+
+    for (const auto& ext : validExtensions) {
+        if (filename.size() > ext.size() && filename.substr(filename.size() - ext.size()) == ext) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// ASCII characters from darkest to lightest
 char mapToAscii(int intensity) {
-    const char* asciiChars = "@#S%?*+;:,. ";
+    const char* asciiChars = "@#S%?O+;:,. ";
     int index = (intensity * (strlen(asciiChars) - 1)) / 255;
     return asciiChars[index];
 }
 
-// Function to check if the filename ends with .jpg
-bool hasJpgExtension(const std::string& filename) {
-    const std::string extension = ".jpg";
-    return filename.length() >= extension.length() &&
-           filename.compare(filename.length() - extension.length(), extension.length(), extension) == 0;
-}
-
-// Function to generate ASCII art from the image
+// Load image using stb_image and generate ASCII art
 void generateAsciiArt(const std::string& imageFilename, int blockSize, const std::string& outputFilename) {
-    // Load the grayscale image
-    cv::Mat image = cv::imread(imageFilename, cv::IMREAD_GRAYSCALE);
-
-    // Check if the image is loaded correctly
-    if (image.empty()) {
-        std::cerr << "Error: Could not open or find the image!" << std::endl;
+    int width, height, channels;
+    
+    // Load image (force 1 channel for grayscale)
+    unsigned char* image = stbi_load(imageFilename.c_str(), &width, &height, &channels, 1);
+    
+    if (!image) {
+        std::cerr << "Error: Could not load image: " << imageFilename << std::endl;
         return;
     }
 
-    // Define block size
-    int rows = image.rows / blockSize;
-    int cols = image.cols / blockSize;
-
-    // 2D array to store the ASCII representation (dimensions: rows x cols)
+    // Calculate ASCII output dimensions
+    int rows = height / blockSize;
+    int cols = width / blockSize;
     std::vector<std::vector<char>> asciiArt(rows, std::vector<char>(cols));
 
-    // Loop through blocks
+    // Process blocks
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
             int total = 0;
 
-            // Calculate the average intensity of the current block
+            // Sum up pixel intensities in the block
             for (int i = 0; i < blockSize; i++) {
                 for (int j = 0; j < blockSize; j++) {
                     int px = x * blockSize + j;
                     int py = y * blockSize + i;
 
-                    if (px < image.cols && py < image.rows) {
-                        total += image.at<uchar>(py, px);
+                    if (px < width && py < height) {
+                        total += image[py * width + px]; // Access pixel intensity
                     }
                 }
             }
 
-            // Calculate average intensity for the block
+            // Compute average intensity
             int avgIntensity = total / (blockSize * blockSize);
-
-            // Map the intensity to an ASCII character and store it in the 2D array
             asciiArt[y][x] = mapToAscii(avgIntensity);
         }
     }
 
-    // Open the result.txt file for writing
-    std::ofstream outputFile(outputFilename); //needs #include <fstream>
-
-    // Check if the file is open
+    // Save ASCII art to a file
+    std::ofstream outputFile(outputFilename);
     if (!outputFile.is_open()) {
-        std::cerr << "Error: Could not open the result.txt file for writing!" << std::endl;
+        std::cerr << "Error: Could not open output file for writing!" << std::endl;
+        stbi_image_free(image);
         return;
     }
 
-    // Write ASCII art to the file
-    for (int y = 0; y < rows; y++) {
-        for (int x = 0; x < cols; x++) {
-            outputFile << asciiArt[y][x] << " ";
+    for (const auto& row : asciiArt) {
+        for (char c : row) {
+            outputFile << c << " ";
         }
-        outputFile << std::endl;
+        outputFile << "\n";
     }
 
-    // Close the file after writing
     outputFile.close();
-
-    std::cout << "ASCII art has been saved to " << outputFilename << "!" << std::endl;
+    stbi_image_free(image); // Free image memory
+    std::cout << "ASCII art saved to " << outputFilename << "!" << std::endl;
 }

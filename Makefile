@@ -1,14 +1,22 @@
-NAME = asciinator
-CC = c++
-OPENCV_CFLAGS = `pkg-config --cflags opencv4`
-OPENCV_LIBS = `pkg-config --libs opencv4`
+# Target Names
+NAME_LINUX = linux_asciinator
+NAME_WINDOWS = win_asciinator.exe
 
-CFLAGS = -Wall -Wextra -Werror -std=c++11 $(OPENCV_CFLAGS)
-LDFLAGS = $(OPENCV_LIBS)
+# Compilers
+CC_LINUX = c++
+CC_WINDOWS = x86_64-w64-mingw32-g++
 
+# Compiler Flags
+CFLAGS = -Wall -Wextra -w -std=c++17 -I./inc
+LDFLAGS_LINUX = -lstdc++
+LDFLAGS_WINDOWS = -static -static-libgcc -static-libstdc++ -lstdc++ -lm -lmingw32 -lgcc
+
+# Source Files
 SRC = src/main.cpp src/ascii_art.cpp
-OBJ_DIR = obj
-OBJ = $(SRC:src/%.cpp=$(OBJ_DIR)/%.o)
+OBJ_DIR_LINUX = obj_linux
+OBJ_DIR_WINDOWS = obj_win
+OBJ_LINUX = $(SRC:src/%.cpp=$(OBJ_DIR_LINUX)/%.o)
+OBJ_WINDOWS = $(SRC:src/%.cpp=$(OBJ_DIR_WINDOWS)/%.o)
 
 # Color codes
 RED = \033[31m
@@ -18,16 +26,24 @@ RESET = \033[0m
 
 SHELL := /bin/bash
 
-all: $(NAME)
+all: linux
 
-$(OBJ_DIR):
-	@ mkdir -p $(OBJ_DIR)
+linux: $(NAME_LINUX)
 
-$(NAME): $(OBJ_DIR) $(OBJ)
-	@ echo -ne "$(MAGENTA)Making $(NAME)"
+windows: $(NAME_WINDOWS)
+
+# Create the object directories
+$(OBJ_DIR_LINUX):
+	@ mkdir -p $(OBJ_DIR_LINUX)
+
+$(OBJ_DIR_WINDOWS):
+	@ mkdir -p $(OBJ_DIR_WINDOWS)
+
+$(NAME_LINUX): $(OBJ_DIR_LINUX) $(OBJ_LINUX)
+	@ echo -ne "$(MAGENTA)Making $(NAME_LINUX)"
 	@ ( \
 		trap 'echo -e "$(RED)Interrupted by user $(RESET)"; exit 1' INT; \
-		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LDFLAGS) & \
+		$(CC_LINUX) $(CFLAGS) -o $(NAME_LINUX) $(OBJ_LINUX) $(LDFLAGS_LINUX) & \
 		PID=$$!; \
 		while kill -0 $$PID 2>/dev/null; do \
 			echo -n "."; \
@@ -41,28 +57,42 @@ $(NAME): $(OBJ_DIR) $(OBJ)
 	)
 	@ echo -ne "\n$(GREEN)Done!$(RED)\n"
 
-# Correct rule for compiling .cpp to .o
-$(OBJ_DIR)/%.o: src/%.cpp
-	@ $(CC) $(CFLAGS) -c $< -o $@
+$(NAME_WINDOWS): $(OBJ_DIR_WINDOWS) $(OBJ_WINDOWS)
+	@ echo -ne "$(MAGENTA)Making $(NAME_WINDOWS)"
+	@ ( \
+		trap 'echo -e "$(RED)Interrupted by user $(RESET)"; exit 1' INT; \
+		$(CC_WINDOWS) $(CFLAGS) -o $(NAME_WINDOWS) $(OBJ_WINDOWS) $(LDFLAGS_WINDOWS) & \
+		PID=$$!; \
+		while kill -0 $$PID 2>/dev/null; do \
+			echo -n "."; \
+			sleep 0.4; \
+			echo -n "."; \
+			sleep 0.6; \
+			echo -n "."; \
+			sleep 0.4; \
+		done; \
+		wait $$PID; \
+	)
+	@ echo -ne "\n$(GREEN)Done!$(RED)\n"
 
-install_opencv:
-	@ echo -e "$(MAGENTA)Installing OpenCV...$(RESET)"
-	@ sudo apt-get update
-	@ sudo apt-get install libopencv-dev
+# Separate compilation rules for Linux and Windows
 
-rm_opencv:
-	@ echo -e "$(RED)Removing OpenCV...$(RESET)"
-	@ sudo apt-get remove --purge libopencv-dev
-	@ sudo apt-get autoremove -y
+$(OBJ_DIR_LINUX)/%.o: src/%.cpp
+	@ $(CC_LINUX) $(CFLAGS) -D_NDEBUG -c $< -o $(OBJ_DIR_LINUX)/$(@F)
+
+$(OBJ_DIR_WINDOWS)/%.o: src/%.cpp
+	@ $(CC_WINDOWS) $(CFLAGS) -D_NDEBUG -c $< -o $(OBJ_DIR_WINDOWS)/$(@F)
 
 clean:
-	@ echo -e "$(RED)Removing $(OBJ_DIR) $(RESET)"
-	@ rm -rf $(OBJ_DIR)
+	@ echo -e "$(RED)Removing $(OBJ_DIR_LINUX)$(RESET)"
+	@ rm -rf $(OBJ_DIR_LINUX)
+	@ echo -e "$(RED)Removing $(OBJ_DIR_WINDOWS)$(RESET)"
+	@ rm -rf $(OBJ_DIR_WINDOWS)
 
 fclean: clean
-	@ echo -e "$(RED)Removing $(NAME) $(RESET)"
-	@ rm -f $(NAME)
+	@ echo -e "$(RED)Removing binaries$(RESET)"
+	@ rm -f $(NAME_LINUX) $(NAME_WINDOWS)
 
 re: fclean all
 
-.PHONY: all clean fclean re install_opencv rm_opencv
+.PHONY: all linux windows clean fclean re
