@@ -2,9 +2,9 @@
 #ifndef ASCII_ART_HPP
 #define ASCII_ART_HPP
 
-#include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 
 // Function to map pixel intensity to ASCII character

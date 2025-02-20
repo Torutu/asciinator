@@ -1,10 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../inc/stb_image.h" // stb_image for image loading
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <cstring> // For strlen()
 #include "../inc/ascii_art.hpp"
 
 bool hasValidImageExtension(const std::string& filename) {
