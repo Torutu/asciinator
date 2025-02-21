@@ -1,10 +1,10 @@
 # Asciinator
 
-Asciinator is a tool that converts image files (currently `.jpg`) into ASCII art. The program reads an image, process it, and generates ASCII art, which can then be saved to a text file.
+Asciinator is a tool that converts image files (currently `.jpg .jpeg .png .bmp`) into ASCII art. The program reads an image, process it, and generates ASCII art, which can then be saved to a text file.
 
 ## Features
 - only works on Linux distributions (Debian, Ubuntu, etc...)
-- Converts `.jpg` images into ASCII art
+- Converts images into ASCII art
 - Customizable block size (between 1-100)
 - doesn't rely on any dependencies
 
