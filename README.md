@@ -43,3 +43,32 @@ make fclean
 ---
 ## Update
 - removed 'opencv' dependencies, now the program can be used without the need to install opencv(it would take 1gb of memory space)
+
+## Pseudocode
+
+1. Check Command Line Arguments:
+   * if the number of arguments is not 3, print a usage message and exit
+   * extract `blockSize` from argument and convert it to an integer.
+   * if `blockSize` is not between 1 and 100, print and error message and exit.
+   * extract the `imageFilename` from the command line argument.
+   * Check if the filename has a valid image extension and ends with `.jpg .jpeg .png .bmp`
+   * if invalid, print an error message and exit.
+3. Generating ASCII ART:
+   * Use `stb_image` to load the image as grayscale.
+   * divide the image into blocks(arrays) by dividing it into rows and cols, `asciiArt[rows][cols]` <- the array of each block
+   * Process each block in the image:
+     * loop over each row `y` and col `x`
+       * Initialize `total` to store the sum of the block intensities
+       * Loop through each pixel in each block
+         * get the actual pixel position `(px, py)`.
+         * after looping through a block we add its intensity to `total`.
+       * Get the `average intensity` of the block.
+       * Assign an `ASCII character` to the block depends on its `intensity`.
+       * Store the character in an array
+4. Save ASCII Art to a File:
+   * Open the outputfile `result.txt` (always check for failure when opening files)
+   * Write each row of the ASCII character to the file.
+   * close the file
+5. Cleanup and Exit
+   * Free image memory and print.
+   * Print a success message.
