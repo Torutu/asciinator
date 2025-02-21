@@ -30,7 +30,7 @@ for example
 and the output will be saved in `result.txt` on the same directory
 
 - `<block size> 1 - 100`:  A value of `1` will print one ASCII character for each pixel, resulting in more **detailed output**. A value of `100` will print one ASCII character for every 100 pixels, producing a less detailed and more **compressed output**.
-- `<image_filename>`:The `.jpg` image file will be converted to ASCII art
+- `<image_filename>`:The image file that will be converted to ASCII art
 ## Avilable Makefile Commands
 - `make`: Builds the project and creates the asciinator executable.
 - `make clean`: Cleans the build by removing object files.
